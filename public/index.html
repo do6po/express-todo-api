@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+    <link href="/materialdesignicons.min.css" rel="stylesheet">
+    <link href="/vuetify.min.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <style>
         .done {
             text-decoration: line-through;
         }
+
         [v-cloak] {
             display: none;
         }
@@ -18,22 +20,29 @@
 <body>
 <div id="app" v-cloak>
     <v-app :dark="isDark">
-        <v-toolbar color="blue darken-4" dark>
-            <v-toolbar-side-icon></v-toolbar-side-icon>
-            <v-toolbar-title class="headline">Список дел</v-toolbar-title>
+        <v-card
+                color="grey lighten-4"
+                flat
+                tile
+        >
+            <v-toolbar color="blue darken-4" dark>
+                <v-app-bar-nav-icon></v-app-bar-nav-icon>
+                <v-toolbar-title class="headline">Список дел</v-toolbar-title>
 
-            <v-spacer></v-spacer>
+                <v-spacer></v-spacer>
 
-            <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                    <v-btn icon @click="show = !show" v-on="on">
-                        <v-icon v-model="isDark" @click="isDark = !isDark">{{ show ? 'check_circle' : 'check_circle_outline' }}
-                        </v-icon>
-                    </v-btn>
-                </template>
-                <span>{{isDark ? 'Светлая тема' : 'Темная тема'}}</span>
-            </v-tooltip>
-        </v-toolbar>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon @click="show = !show" v-on="on">
+                            <v-icon v-model="isDark" @click="isDark = !isDark">
+                                {{ show ? 'check_circle' : 'check_circle_outline' }}
+                            </v-icon>
+                        </v-btn>
+                    </template>
+                    <span>{{isDark ? 'Светлая тема' : 'Темная тема'}}</span>
+                </v-tooltip>
+            </v-toolbar>
+        </v-card>
         <v-container>
             <v-layout row justify-center>
                 <v-flex xs12>
@@ -98,136 +107,8 @@
     </v-app>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
-<!--<script src="/app.js"></script>-->
-<script >
-    new Vue({
-        el: '#app',
-        data() {
-            return {
-                isDark: true,
-                show: true,
-                todoTitle: '',
-                todos: []
-            }
-        },
-        created() {
-            const query = `
-      query {
-        getTodos {
-          id title done createdAt updatedAt
-        }
-      }
-    `
-
-            fetch('/graphql', {
-                method: 'post',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ query })
-            })
-                .then(res => res.json())
-                .then(response => {
-                    this.todos = response.data.getTodos
-                })
-        },
-        methods: {
-            addTodo() {
-                const title = this.todoTitle.trim()
-                if (!title) {
-                    return
-                }
-                const query = `
-        mutation {
-          createTodo(todo: {title: "${title}"}) {
-            id title done createdAt updatedAt
-          }
-        }
-      `
-                fetch('/graphql', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({query})
-                })
-                    .then(res => res.json())
-                    .then(response => {
-                        const todo = response.data.createTodo
-                        this.todos.push(todo)
-                        this.todoTitle = ''
-                    })
-                    .catch(e => console.log(e))
-            },
-            removeTodo(id) {
-                const query = `
-        mutation {
-          deleteTodo(id: "${id}")
-        }
-      `
-                fetch('/graphql', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ query })
-                })
-                    .then(() => {
-                        this.todos = this.todos.filter(t => t.id !== id)
-                    })
-                    .catch(e => console.log(e))
-            },
-            completeTodo(id) {
-                const query = `
-        mutation {
-          completeTodo(id: "${id}") {
-            updatedAt
-          }
-        }
-      `
-
-
-                fetch('/graphql', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ query })
-                })
-                    .then(res => res.json())
-                    .then(response => {
-                        const idx = this.todos.findIndex(t => t.id === id)
-                        this.todos[idx].updatedAt = response.data.completeTodo.updatedAt
-                    })
-                    .catch(e => console.log(e))
-            }
-        },
-        filters: {
-            capitalize(value) {
-                return value.toString().charAt(0).toUpperCase() + value.slice(1)
-            },
-            date(value, withTime) {
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: '2-digit'
-                }
-
-                if (withTime) {
-                    options.hour = '2-digit'
-                    options.minute = '2-digit'
-                    options.second = '2-digit'
-                }
-                return new Intl.DateTimeFormat('ru-RU', options).format(new Date(+value))
-            }
-        }
-    })
-</script>
+<script src="/vue.js"></script>
+<script src="/vuetify.js"></script>
+<script src="/app.js"></script>
 </body>
 </html>
