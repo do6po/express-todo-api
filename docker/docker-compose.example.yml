@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+
+  mysql:
+    image: mysql:5.7.28
+    container_name: ${APP_NAME}_mysql
+    ports:
+      - ${DOCKER_ADDRESS}:${DB_PORT}:${DB_PORT}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - ./storage/mysql/:/var/lib/mysql/
+    restart: always
+
+#networks:
+#  default:
+#    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: ${DOCKER_NETWORK}

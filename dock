@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+source .env 2> /dev/null
+
+TERM=xterm-256color
+
+COMMAND=$1
+
+dc="docker-compose -p ${APP_NAME}"
+
+db="mysql"
+
+ADDRESS=${DOCKER_ADDRESS} || 'localhost'
+MESSAGE="http://${ADDRESS}"
+
+case ${COMMAND} in
+  init)
+
+    cp -n .env.example .env
+    cp -n ./docker/docker-compose.example.yml docker-compose.yml
+
+    echo "Configuration done."
+
+  ;;
+  build)
+    ${dc} up --build --force-recreate
+
+  ;;
+  start)
+    ${dc} start
+    echo ${MESSAGE}
+
+  ;;
+  stop)
+    ${dc} stop
+
+  ;;
+  down)
+    ${dc} down
+
+  ;;
+  logs)
+    ${dc} logs -f
+
+  ;;
+  ps)
+    ${dc} ps
+
+  ;;
+  restart)
+    ${dc} restart
+    echo ${MESSAGE}
+
+  ;;
+
+  db)
+    ${dc} exec ${db} bash
+
+  ;;
+
+  help|--help)
+    echo "Usage:
+
+    init      : Init docker configuration.
+    build     : Building containers.
+    start     : To start containers.
+    stop      : To stop containers.
+    down      : Destroy containers.
+    restart   : Destroy containers.
+    logs      : Show logs from containers.
+    ps        : Show status for containers.
+    db        : Go to inside db container.
+    db_testing: Go to inside db_testing container.
+    node      : Go to inside node container.
+    cache     : Go to inside cache container.
+    help      : See this help.
+    "
+
+  ;;
+esac
