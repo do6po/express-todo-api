@@ -24,7 +24,7 @@ new Vue({
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ query })
+            body: JSON.stringify({query})
         })
             .then(res => res.json())
             .then(response => {
@@ -37,28 +37,17 @@ new Vue({
             if (!title) {
                 return
             }
-            const query = `
-        mutation {
-          createTodo(todo: {title: "${title}"}) {
-            id title done createdAt updatedAt
-          }
-        }
-      `
-            fetch('/graphql', {
+            fetch('/api/todo', {
                 method: 'post',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({query})
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({title})
             })
                 .then(res => res.json())
-                .then(response => {
-                    const todo = response.data.createTodo
+                .then(({todo}) => {
+                    console.log(todo)
                     this.todos.push(todo)
                     this.todoTitle = ''
                 })
-                .catch(e => console.log(e))
         },
         removeTodo(id) {
             const query = `
@@ -72,7 +61,7 @@ new Vue({
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({query})
             })
                 .then(() => {
                     this.todos = this.todos.filter(t => t.id !== id)
@@ -95,7 +84,7 @@ new Vue({
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ query })
+                body: JSON.stringify({query})
             })
                 .then(res => res.json())
                 .then(response => {
