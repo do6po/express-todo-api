@@ -44,10 +44,10 @@ new Vue({
             })
                 .then(res => res.json())
                 .then(({todo}) => {
-                    console.log(todo)
                     this.todos.push(todo)
                     this.todoTitle = ''
                 })
+                .catch(e => console.log(e))
         },
         removeTodo(id) {
             const query = `

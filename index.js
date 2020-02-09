@@ -1,10 +1,8 @@
 const app = require('./bootstrap/app')
-const routes = require('./routes/main')
 const sequelize = require('./bootstrap/database')
 
 require('dotenv').config()
 
-app.use('/api/todo', routes)
 
 async function start() {
     try {
