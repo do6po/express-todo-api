@@ -10,28 +10,17 @@ new Vue({
         }
     },
     created() {
-        const query = `
-      query {
-        getTodos {
-          id title done createdAt updatedAt
-        }
-      }
-    `
-
-        fetch('/graphql', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({query})
-        })
-            .then(res => res.json())
-            .then(response => {
-                this.todos = response.data.getTodos
-            })
+        this.getAll()
     },
     methods: {
+        getAll() {
+            fetch('/api/todo', {method: 'get'})
+                .then(res => res.json())
+                .then(res => {
+                    this.todos = res
+                })
+                .catch(e => console.log(e))
+        },
         addTodo() {
             const title = this.todoTitle.trim()
             if (!title) {
@@ -110,7 +99,7 @@ new Vue({
                 options.minute = '2-digit'
                 options.second = '2-digit'
             }
-            return new Intl.DateTimeFormat('ru-RU', options).format(new Date(+value))
+            return new Intl.DateTimeFormat('ru-RU', options).format(new Date(value))
         }
     }
 })

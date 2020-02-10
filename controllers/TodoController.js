@@ -1,25 +1,24 @@
+const BasicController = require('./BasicController')
 const Todo = require('../models/todo')
 
-class TodoController {
+class TodoController extends BasicController {
     async index(req, res) {
+        return this.handle(req, res, async (req, res) => {
+            const todos = await Todo.findAll()
 
+            return res.status(200).json(todos)
+        })
     }
 
     async add(req, res) {
-        try {
+        return this.handle(req, res, async (req, res) => {
             const todo = Todo.create({
                 title: req.body.title,
                 done: false
             })
 
             return res.status(201).json({todo})
-        } catch (e) {
-            console.log(e)
-
-            return res.status(500).json({
-                message: 'Server error.',
-            })
-        }
+        })
     }
 
     async edit(req, res) {
@@ -29,6 +28,7 @@ class TodoController {
     async delete(req, res) {
 
     }
+
 }
 
 module.exports = TodoController
