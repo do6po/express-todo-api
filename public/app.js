@@ -58,34 +58,24 @@ new Vue({
                 .catch(e => console.log(e))
         },
         completeTodo(id) {
-            const query = `
-        mutation {
-          completeTodo(id: "${id}") {
-            updatedAt
-          }
-        }
-      `
-
-
-            fetch('/graphql', {
-                method: 'post',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({query})
+            fetch('/api/todo', {
+                method: 'put',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({done: true})
             })
                 .then(res => res.json())
-                .then(response => {
+                .then(({todo}) => {
                     const idx = this.todos.findIndex(t => t.id === id)
-                    this.todos[idx].updatedAt = response.data.completeTodo.updatedAt
+                    this.todos[idx].updatedAt = todo.updatedAt
                 })
                 .catch(e => console.log(e))
+
         }
     },
     filters: {
         capitalize(value) {
-            return value.toString().charAt(0).toUpperCase() + value.slice(1)
+            return value
+            // return value.toString().charAt(0).toUpperCase() + value.slice(1)
         },
         date(value, withTime) {
             const options = {

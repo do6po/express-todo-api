@@ -6,7 +6,7 @@ class BasicController {
             return callback(req, res)
         } catch (e) {
             console.log(e)
-            this.responseError(res, e)
+            return this.responseError(res, e)
         }
     }
 
